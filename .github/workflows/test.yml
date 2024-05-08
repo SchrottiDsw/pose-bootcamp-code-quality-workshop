@@ -6,7 +6,11 @@ jobs:
  runtests:
     runs-on: ubuntu-latest
     steps:
-     - name: compile
-       run: cmake --build build -j
-     - name: runtest
-       run: ./build/address_book_tests
+        - name: Checkout
+        uses: actions/checkout@v4
+        with:
+            clean: true
+        - name: compile
+        run: cmake --build build -j
+        - name: runtest
+        run: ./build/address_book_tests
