@@ -83,6 +83,30 @@ std::string address_book::get_next_birthday() const {
 	return prettify_name(name);
 }
 
+void address_book::synchronize(synchronization_provider& provider) {
+	std::vector<std::string> serialized_entries;
+	for(const auto& [name, entry] : m_entries) {
+		std::string serialized_entry = name + "," + std::to_string(entry.phone_number) + ","
+		                               + std::to_string(static_cast<unsigned>(entry.birthday.month())) + "/"
+		                               + std::to_string(static_cast<unsigned>(entry.birthday.day()));
+		serialized_entries.push_back(serialized_entry);
+	}
+	std::vector<std::string> merged_entries = provider.synchronize(serialized_entries);
+	m_entries.clear();
+	for(const std::string& serialized_entry : merged_entries) {
+		std::string name(max_name_length, '\0');
+		std::uint64_t phone_number;
+		unsigned month;
+		unsigned day;
+		char format[32] = {0};
+		snprintf(format, sizeof(format), "%%%zu[^,],%%lu,%%u/%%u", max_name_length);
+		sscanf(serialized_entry.c_str(), format, name.data(), &phone_number, &month, &day);
+		name.erase(name.find('\0'));
+		m_entries.try_emplace(normalize_name(name),
+		    entry{phone_number, std::chrono::month_day{std::chrono::month{month}, std::chrono::day{day}}});
+	}
+}
+
 address_book::entry& address_book::get_entry(std::string name) {
 	auto it = m_entries.find(normalize_name(name));
 	if(it == m_entries.end()) { throw std::invalid_argument("Entry not found"); }

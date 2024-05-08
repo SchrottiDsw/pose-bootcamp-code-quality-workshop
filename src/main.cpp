@@ -52,12 +52,18 @@ void next_birthday(address_book& ab) {
 	printf("%s's birthday is on %u/%u\n", name.c_str(), (unsigned)birthday.month(), (unsigned)birthday.day());
 }
 
+void synchronize(address_book& ab) {
+	http_synchronization_provider provider{"http://localhost:3333"};
+	ab.synchronize(provider);
+	printf("Synchronized %zu entries\n", ab.get_entries().size());
+}
+
 int main() {
 	address_book ab;
 
 	printf("Address Book\n");
 	while(true) {
-		printf("\n(A)dd entry, (R)emove entry, (L)ist entries, (N)ext birthday, (Q)uit\n");
+		printf("\n(A)dd entry, (R)emove entry, (L)ist entries, (N)ext birthday, (S)ynchronize, (Q)uit\n");
 
 		try {
 			char choice;
@@ -75,6 +81,9 @@ int main() {
 
 			case 'N':
 			case 'n': next_birthday(ab); break;
+
+			case 'S':
+			case 's': synchronize(ab); break;
 
 			case 'Q':
 			case 'q': return 0;
