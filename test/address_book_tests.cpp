@@ -26,14 +26,10 @@ TEST_CASE("names must be between 1 and 100 chars") {
 	address_book ab;
 	CHECK_THROWS_WITH(ab.add_entry(""), "Name may not be empty");
 	
-	std::string name= "";
-	for ( int i=0 ; i<=100;++i)
-		name += "a";
+	std::string name(101,'a');
 	CHECK_THROWS_WITH(ab.add_entry(name), "Name too long");
 
-	name = "";
-	for ( int i=0 ; i<100;++i)
-		name += "a";
+	name = std::string(100,'a');
 	ab.add_entry(name);
 	CHECK(ab.has_entry(name));
 
