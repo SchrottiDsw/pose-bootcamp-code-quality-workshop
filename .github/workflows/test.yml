@@ -10,6 +10,8 @@ jobs:
           uses: actions/checkout@v4
           with:
             clean: true
+        - name: checkout submodules 
+          run: cd pose-bootcamp-code-quality-workshop/ & git submodule update --init
         - name: config cmake
           run: cmake -S . -B build
         - name: compile
