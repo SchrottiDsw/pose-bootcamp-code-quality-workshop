@@ -1,5 +1,7 @@
 #pragma once
 
+#include "synchronization.hpp"
+
 #include <chrono>
 #include <cstdint>
 #include <string>
@@ -45,6 +47,9 @@ class address_book {
 	/// Returns the entry with the next birthday, relative to the current date.
 	/// Throws if the address book is empty.
 	std::string get_next_birthday() const;
+
+	/// Synchronizes the address book with a remote provider.
+	void synchronize(synchronization_provider& provider);
 
   private:
 	struct entry {

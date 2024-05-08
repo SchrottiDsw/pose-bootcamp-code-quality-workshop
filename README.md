@@ -7,10 +7,13 @@ This is a small example application for which we want to write unit tests using 
 To build and run the application and tests, the following are required:
 - CMake
 - A modern C++ compiler (a few C++20 features are used, GCC 11.4 is sufficient)
+- Python 3 (to run the HTTP synchronization server)
 
 Configure the build using `cmake -S . -B build`, then use `cmake --build build` to compile.
 This produces two executables, `address_book` and `address_book_tests` inside the `build` directory.
 Both executables can be called without any arguments; the tests support various options for how to run them, run `address_book_tests --help` for more information.
+
+To enable the synchronization feature, start the `simple_sync_server.py`.
 
 ## Specification
 
@@ -25,3 +28,6 @@ The `address_book` class defined in `src/address_book.hpp|.cpp` adheres to the f
 - A phone number and birthday can be set for each entry.
   - Attempting to set a phone number or birthday on a non-existent entry throws an exception.
   - Attempting to set an invalid date as birthday throws an exception.
+- The address book can be synchronized with a remote location using a *synchronization provider*.
+  - The synchronization provider offers a single function `synchronize`, that is given a list of all local entries, serialized as `name,number,MM/DD`, for example `jane m doe,123456789,11/30`.
+    It then returns a list in the same format after synchronization.
