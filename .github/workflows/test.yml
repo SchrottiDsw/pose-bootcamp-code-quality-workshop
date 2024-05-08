@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout
-        uses: actions/checkout@v4
-        with:
+          uses: actions/checkout@v4
+          with:
             clean: true
         - name: compile
-        run: cmake --build build -j
+          run: cmake --build build -j
         - name: runtest
-        run: ./build/address_book_tests
+          run: ./build/address_book_tests
