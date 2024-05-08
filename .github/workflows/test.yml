@@ -1,0 +1,11 @@
+name: “Compile & Run Tests"
+on:
+ push:
+ pull_request:
+jobs:
+ runtests:
+   steps:
+     - name: compile
+       run: cmake --build build -j
+     - name: runtest
+       run: ./build/address_book_tests
