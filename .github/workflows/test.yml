@@ -1,10 +1,11 @@
 name: “Compile & Run Tests"
 on:
- push:
- pull_request:
+    push:
+    pull_request:
 jobs:
  runtests:
-   steps:
+    runs-on: ubuntu-latest
+    steps:
      - name: compile
        run: cmake --build build -j
      - name: runtest
