@@ -111,3 +111,77 @@ TEST_CASE("set birthday validation") {
 }
 
 
+// Synchronization provider that synchronizes with a file.
+class mock_synchronization_provider : public synchronization_provider {
+  public:
+	mock_synchronization_provider() = default;
+	std::vector<std::string> synchronize(std::vector<std::string> serialized_entries) override
+	{
+		std::vector<std::string> merged_entries = serialized_entries;
+		for(std::string remote_entry : m_entries) {
+			bool found = false;
+			std::string name = remote_entry.substr(0, remote_entry.find(','));
+			if(std::none_of(merged_entries.begin(), merged_entries.end(),
+				[&name](std::string entry) { return entry.substr(0, entry.find(',')) == name; })) {
+				merged_entries.push_back(remote_entry);
+			}
+		}
+		m_entries = merged_entries;
+		return merged_entries;
+	}
+
+  private:
+	std::vector<std::string> m_entries;
+};
+
+TEST_CASE("sychronization load test") {
+	address_book ab;
+
+	ab.add_entry("Test");
+	ab.set_phone_number("Test",111);
+	ab.add_entry("Test2");
+	ab.set_phone_number("Test2",222);
+
+	auto mockProvider = mock_synchronization_provider();
+	ab.synchronize( mockProvider);
+
+	// Entries sollten gleich sein
+	CHECK(ab.get_phone_number("Test") == 111 );
+	CHECK(ab.get_phone_number("Test2") == 222 );
+
+
+	address_book ab2;
+
+	ab2.synchronize(mockProvider);
+
+	CHECK(ab2.get_phone_number("Test") == 111 );
+	CHECK(ab2.get_phone_number("Test2") == 222 );
+}
+
+TEST_CASE("sychronization load overwrite") {
+	address_book ab;
+
+	ab.add_entry("Test");
+	ab.set_phone_number("Test",111);
+	ab.add_entry("Test2");
+	ab.set_phone_number("Test2",222);
+
+	auto mockProvider = mock_synchronization_provider();
+	ab.synchronize( mockProvider);
+
+	// Entries sollten gleich sein
+	CHECK(ab.get_phone_number("Test") == 111 );
+	CHECK(ab.get_phone_number("Test2") == 222 );
+
+
+	address_book ab2;
+	ab2.add_entry("Test");
+	ab2.set_phone_number("Test",123);
+	ab2.add_entry("Test2");
+	ab2.set_phone_number("Test2",321);
+
+	ab2.synchronize(mockProvider);
+
+	CHECK(ab2.get_phone_number("Test") == 123 );
+	CHECK(ab2.get_phone_number("Test2") == 321 );
+}
